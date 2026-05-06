@@ -3,6 +3,7 @@ import { ConfluenceClient } from './api/client.js';
 import { loadConfig } from './config.js';
 import { registerAllTools } from './tools/index.js';
 import { registerAllResources } from './resources/index.js';
+import { registerAllPrompts } from './prompts/index.js';
 
 export function createConfluenceServer(config?: { name?: string; version?: string }): McpServer {
   const serverName = config?.name ?? 'confluence-mcp';
@@ -22,6 +23,7 @@ export function createConfluenceServer(config?: { name?: string; version?: strin
 
   registerAllTools(server, client);
   registerAllResources(server, client);
+  registerAllPrompts(server, client);
 
   return server;
 }
