@@ -42,7 +42,7 @@ export async function getBlogPost(
   if (options?.bodyFormat) params.set('body-format', options.bodyFormat);
 
   const query = params.toString();
-  return client.request<BlogPostResponse>('GET', `/blogposts/${blogPostId}${query ? `?${query}` : ''}`);
+  return client.request<BlogPostResponse>('GET', `/content/${blogPostId}${query ? `?${query}` : ''}`);
 }
 
 /**
@@ -59,12 +59,13 @@ export async function listBlogPosts(
   options?: ListBlogPostsOptions
 ): Promise<BlogPostsListResponse> {
   const params = new URLSearchParams();
-  if (spaceId) params.set('space-id', spaceId);
+  params.set('type', 'blogpost');
+  if (spaceId) params.set('spaceKey', spaceId);
   if (options?.limit) params.set('limit', options.limit.toString());
-  if (options?.cursor) params.set('cursor', options.cursor);
+  if (options?.cursor) params.set('start', options.cursor);
 
   const query = params.toString();
-  return client.request<BlogPostsListResponse>('GET', `/blogposts${query ? `?${query}` : ''}`);
+  return client.request<BlogPostsListResponse>('GET', `/content${query ? `?${query}` : ''}`);
 }
 
 /**
@@ -78,7 +79,19 @@ export async function createBlogPost(
   client: ConfluenceClient,
   data: CreateBlogPostData
 ): Promise<BlogPostResponse> {
-  return client.request<BlogPostResponse>('POST', '/blogposts', data);
+  const payload: any = {
+    type: 'blogpost',
+    title: data.title,
+    space: { key: data.spaceId },
+    body: {
+      [data.representation || 'storage']: {
+        value: data.body,
+        representation: data.representation || 'storage'
+      }
+    }
+  };
+  
+  return client.request<BlogPostResponse>('POST', '/content', payload);
 }
 
 /**
@@ -94,7 +107,21 @@ export async function updateBlogPost(
   blogPostId: string,
   data: UpdateBlogPostData
 ): Promise<BlogPostResponse> {
-  return client.request<BlogPostResponse>('PUT', `/blogposts/${blogPostId}`, data);
+  const payload: any = {
+    title: data.title,
+    version: { number: data.version }
+  };
+  
+  if (data.body) {
+    payload.body = {
+      storage: {
+        value: data.body,
+        representation: 'storage'
+      }
+    };
+  }
+  
+  return client.request<BlogPostResponse>('PUT', `/content/${blogPostId}`, payload);
 }
 
 /**
@@ -108,5 +135,5 @@ export async function deleteBlogPost(
   client: ConfluenceClient,
   blogPostId: string
 ): Promise<void> {
-  await client.request<void>('DELETE', `/blogposts/${blogPostId}`);
+  await client.request<void>('DELETE', `/content/${blogPostId}`);
 }

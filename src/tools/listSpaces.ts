@@ -34,7 +34,7 @@ export function registerListSpacesTool(server: McpServer, client: ConfluenceClie
           key: space.key,
           name: space.name,
           type: space.type,
-          status: space.status,
+          status: (space as any).status || 'current',
           webUrl: space._links.webui
         }));
         

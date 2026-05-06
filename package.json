@@ -16,18 +16,23 @@
     "docs": "echo 'Documentation available in docs/'",
     "docs:check": "find docs -name '*.md' | xargs wc -l"
   },
-  "keywords": ["mcp", "confluence", "atlassian"],
+  "keywords": [
+    "mcp",
+    "confluence",
+    "atlassian"
+  ],
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
+    "dotenv": "^17.4.2",
     "zod": "^3.22.0"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
-    "typescript": "^5.3.0",
-    "vitest": "^1.0.0",
-    "eslint": "^8.55.0",
     "@typescript-eslint/eslint-plugin": "^6.13.0",
-    "@typescript-eslint/parser": "^6.13.0"
+    "@typescript-eslint/parser": "^6.13.0",
+    "eslint": "^8.55.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
   }
 }
