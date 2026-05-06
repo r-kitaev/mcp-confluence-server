@@ -2,8 +2,8 @@ import type { ConfluenceConfig } from '../types.js';
 import { ConfluenceAPIError } from '../types.js';
 
 export class ConfluenceClient {
-  private baseUrl: string;
-  private authHeader: string;
+  protected baseUrl: string;
+  protected authHeader: string;
   private rateLimitRemaining: number = 65000;
   private rateLimitReset: number = 0;
 
@@ -19,7 +19,7 @@ export class ConfluenceClient {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  async request<T>(method: string, endpoint: string, data?: unknown): Promise<T> {
+  async request<T>(method: string, endpoint: string, data?: unknown, headers?: Record<string, string>): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
 
     let lastError: Error | null = null;
@@ -34,14 +34,30 @@ export class ConfluenceClient {
           }
         }
 
+        const requestHeaders: Record<string, string> = {
+          'Authorization': `Basic ${this.authHeader}`,
+          'Accept': 'application/json'
+        };
+
+        if (headers) {
+          Object.assign(requestHeaders, headers);
+        } else if (data) {
+          requestHeaders['Content-Type'] = 'application/json';
+        }
+
+        let body: ArrayBuffer | string | null = null;
+        if (data) {
+          if (data instanceof Buffer) {
+            body = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
+          } else {
+            body = JSON.stringify(data);
+          }
+        }
+
         const response = await fetch(url, {
           method,
-          headers: {
-            'Authorization': `Basic ${this.authHeader}`,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          body: data ? JSON.stringify(data) : undefined
+          headers: requestHeaders,
+          body
         });
 
         const remaining = response.headers.get('X-RateLimit-Remaining');
@@ -72,7 +88,12 @@ export class ConfluenceClient {
           );
         }
 
-        return await response.json() as T;
+        const contentType = response.headers.get('Content-Type');
+        if (contentType && contentType.includes('application/json')) {
+          return await response.json() as T;
+        }
+
+        return {} as T;
       } catch (error) {
         lastError = error as Error;
 
@@ -88,5 +109,27 @@ export class ConfluenceClient {
     }
 
     throw lastError || new Error('Request failed after all retries');
+  }
+
+  async downloadBinary(endpoint: string): Promise<Buffer> {
+    const url = `${this.baseUrl}${endpoint}`;
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Basic ${this.authHeader}`,
+        'Accept': '*/*'
+      }
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      throw new ConfluenceAPIError(
+        errorBody || `HTTP ${response.status}: ${response.statusText}`,
+        response.status
+      );
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+    return Buffer.from(arrayBuffer);
   }
 }
