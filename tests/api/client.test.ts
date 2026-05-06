@@ -64,25 +64,26 @@ describe('ConfluenceClient', () => {
 
   describe('retry logic', () => {
     it('retries on 429 with exponential backoff', async () => {
-      mockFetch.mockResolvedValue({
-        status: 429,
-        ok: false,
-        headers: {
-          get: () => '1'
-        },
-        text: async () => 'Rate limit exceeded'
-      });
-      mockFetch.mockResolvedValue({
-        status: 200,
-        ok: true,
-        headers: {
-          get: (name: string) => {
-            if (name === 'Content-Type') return 'application/json';
-            return null;
-          }
-        },
-        json: async () => ({ results: [] })
-      });
+      mockFetch
+        .mockResolvedValueOnce({
+          status: 429,
+          ok: false,
+          headers: {
+            get: () => '1'
+          },
+          text: async () => 'Rate limit exceeded'
+        })
+        .mockResolvedValueOnce({
+          status: 200,
+          ok: true,
+          headers: {
+            get: (name: string) => {
+              if (name === 'Content-Type') return 'application/json';
+              return null;
+            }
+          },
+          json: async () => ({ results: [] })
+        });
 
       const result = await client.request('GET', '/space');
 
