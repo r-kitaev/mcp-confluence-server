@@ -27,7 +27,7 @@ export function registerGetAttachmentsTool(server: McpServer, client: Confluence
           title: attachment.title,
           mediaType: attachment.mediaType,
           fileSize: attachment.fileSize,
-          downloadLink: attachment._links?.download || attachment.downloadLink
+          downloadLink: attachment.downloadLink
         })) || [];
         
         return {
