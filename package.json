@@ -12,7 +12,9 @@
     "test": "vitest",
     "test:coverage": "vitest --coverage",
     "lint": "eslint src/",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "docs": "echo 'Documentation available in docs/'",
+    "docs:check": "find docs -name '*.md' | xargs wc -l"
   },
   "keywords": ["mcp", "confluence", "atlassian"],
   "license": "MIT",
