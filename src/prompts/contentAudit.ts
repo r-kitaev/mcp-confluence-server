@@ -4,27 +4,22 @@ import type { ConfluenceClient } from '../api/client.js';
 import { getSpace } from '../api/spaces.js';
 import { listPages } from '../api/pages.js';
 
-const InputSchema = z.object({
-  spaceId: z.string().describe('ID пространства для аудита'),
-  limit: z.number().default(100).describe('Максимальное количество страниц для анализа (default 100)')
-});
-
 /**
  * Зарегистрировать промпт для аудита контента пространства Confluence
  * @param server - экземпляр McpServer
  * @param client - экземпляр ConfluenceClient
  */
 export function registerContentAuditPrompt(server: McpServer, client: ConfluenceClient): void {
-  server.registerPrompt(
+  server.prompt(
     'contentAudit',
+    'Промпт для аудита контента пространства Confluence',
     {
-      title: 'Audit Space Content',
-      description: 'Промпт для аудита контента пространства Confluence',
-      argsSchema: InputSchema.shape
+      spaceId: z.string().describe('ID пространства для аудита'),
+      limit: z.number().default(100).describe('Максимальное количество страниц для анализа')
     },
-    async (args) => {
-      const space = await getSpace(client, args.spaceId);
-      const pagesResponse = await listPages(client, args.spaceId, { limit: args.limit });
+    async ({ spaceId, limit }) => {
+      const space = await getSpace(client, spaceId);
+      const pagesResponse = await listPages(client, spaceId, { limit });
 
       const pageHierarchy = pagesResponse.results.map((page) => ({
         id: page.id,
@@ -37,7 +32,7 @@ export function registerContentAuditPrompt(server: McpServer, client: Confluence
 
 Space Statistics:
 - Total Pages: ${pagesResponse.results.length}
-- Homepage ID: ${space._links.webui}
+- Homepage ID: ${space.id}
 
 Page Hierarchy:
 ${JSON.stringify(pageHierarchy, null, 2)}

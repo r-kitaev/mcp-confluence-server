@@ -14,7 +14,7 @@ describe('registerPageReviewPrompt', () => {
   beforeEach(() => {
     promptHandler = vi.fn();
     server = {
-      registerPrompt: vi.fn()
+      prompt: vi.fn()
     } as unknown as McpServer;
     client = {} as ConfluenceClient;
     vi.clearAllMocks();
@@ -39,8 +39,8 @@ describe('registerPageReviewPrompt', () => {
     });
 
     registerPageReviewPrompt(server, client);
-    const call = vi.mocked(server.registerPrompt).mock.calls[0];
-    const handler = call[2];
+    const call = vi.mocked(server.prompt).mock.calls[0];
+    const handler = call[3];
     const result = await handler({ pageId: '123' });
 
     expect(result).toHaveProperty('messages');
@@ -67,8 +67,8 @@ describe('registerPageReviewPrompt', () => {
     });
 
     registerPageReviewPrompt(server, client);
-    const call = vi.mocked(server.registerPrompt).mock.calls[0];
-    const handler = call[2];
+    const call = vi.mocked(server.prompt).mock.calls[0];
+    const handler = call[3];
     const result = await handler({ pageId: '123' });
 
     const promptText = result.messages[0].content.text;
@@ -99,8 +99,8 @@ describe('registerPageReviewPrompt', () => {
     });
 
     registerPageReviewPrompt(server, client);
-    const call = vi.mocked(server.registerPrompt).mock.calls[0];
-    const handler = call[2];
+    const call = vi.mocked(server.prompt).mock.calls[0];
+    const handler = call[3];
     const result = await handler({ pageId: '123' });
 
     const promptText = result.messages[0].content.text;
@@ -131,8 +131,8 @@ describe('registerPageReviewPrompt', () => {
     });
 
     registerPageReviewPrompt(server, client);
-    const call = vi.mocked(server.registerPrompt).mock.calls[0];
-    const handler = call[2];
+    const call = vi.mocked(server.prompt).mock.calls[0];
+    const handler = call[3];
     const result = await handler({ pageId: '123' });
 
     const promptText = result.messages[0].content.text;
@@ -146,8 +146,8 @@ describe('registerPageReviewPrompt', () => {
     vi.mocked(pagesApi.getPage).mockRejectedValue(new Error('API Error'));
 
     registerPageReviewPrompt(server, client);
-    const call = vi.mocked(server.registerPrompt).mock.calls[0];
-    const handler = call[2];
+    const call = vi.mocked(server.prompt).mock.calls[0];
+    const handler = call[3];
 
     await expect(handler({ pageId: '123' })).rejects.toThrow('API Error');
   });

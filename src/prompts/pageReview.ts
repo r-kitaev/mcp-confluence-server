@@ -3,25 +3,20 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { ConfluenceClient } from '../api/client.js';
 import { getPage } from '../api/pages.js';
 
-const InputSchema = z.object({
-  pageId: z.string().describe('ID страницы для ревью')
-});
-
 /**
  * Зарегистрировать промпт для ревью страницы Confluence
  * @param server - экземпляр McpServer
  * @param client - экземпляр ConfluenceClient
  */
 export function registerPageReviewPrompt(server: McpServer, client: ConfluenceClient): void {
-  server.registerPrompt(
+  server.prompt(
     'pageReview',
+    'Промпт для ревью содержимого страницы Confluence',
     {
-      title: 'Review Confluence Page',
-      description: 'Промпт для ревью содержимого страницы Confluence',
-      argsSchema: InputSchema.shape
+      pageId: z.string().describe('ID страницы для ревью')
     },
-    async (args) => {
-      const page = await getPage(client, args.pageId, { includeBody: true, bodyFormat: 'view' });
+    async ({ pageId }) => {
+      const page = await getPage(client, pageId, { includeBody: true, bodyFormat: 'view' });
 
       const bodyContent = 'body' in page && page.body?.view?.value 
         ? page.body.view.value 
