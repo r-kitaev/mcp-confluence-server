@@ -50,9 +50,9 @@ export async function getPage(
   if (options?.includeBody) params.set('include-body', 'true');
   if (options?.includeLabels) params.set('include-labels', 'true');
   if (options?.bodyFormat) params.set('body-format', options.bodyFormat);
-
+  
   const query = params.toString();
-  return client.request<PageResponse | PageWithBody>('GET', `/pages/${pageId}${query ? `?${query}` : ''}`);
+  return client.request<PageResponse | PageWithBody>('GET', `/content/${pageId}${query ? `?${query}` : ''}`);
 }
 
 /**
@@ -69,12 +69,14 @@ export async function listPages(
   options?: ListPagesOptions
 ): Promise<PagesListResponse> {
   const params = new URLSearchParams();
+  params.set('spaceKey', spaceId);
+  params.set('type', 'page');
   if (options?.parentId) params.set('parent-id', options.parentId);
   if (options?.limit) params.set('limit', options.limit.toString());
-  if (options?.cursor) params.set('cursor', options.cursor);
-
+  if (options?.cursor) params.set('start', options.cursor);
+  
   const query = params.toString();
-  return client.request<PagesListResponse>('GET', `/spaces/${spaceId}/pages${query ? `?${query}` : ''}`);
+  return client.request<PagesListResponse>('GET', `/content${query ? `?${query}` : ''}`);
 }
 
 /**
@@ -88,7 +90,23 @@ export async function createPage(
   client: ConfluenceClient,
   data: CreatePageData
 ): Promise<PageResponse> {
-  return client.request<PageResponse>('POST', '/pages', data);
+  const payload: any = {
+    type: 'page',
+    title: data.title,
+    space: { key: data.spaceId },
+    body: {
+      [data.representation || 'storage']: {
+        value: data.body,
+        representation: data.representation || 'storage'
+      }
+    }
+  };
+  
+  if (data.parentId) {
+    payload.ancestors = [{ id: data.parentId }];
+  }
+  
+  return client.request<PageResponse>('POST', '/content', payload);
 }
 
 /**
@@ -104,7 +122,21 @@ export async function updatePage(
   pageId: string,
   data: UpdatePageData
 ): Promise<PageResponse> {
-  return client.request<PageResponse>('PUT', `/pages/${pageId}`, data);
+  const payload: any = {
+    title: data.title,
+    version: { number: data.version, minorEdit: true, message: data.updateMessage || '' }
+  };
+  
+  if (data.body) {
+    payload.body = {
+      [data.representation || 'storage']: {
+        value: data.body,
+        representation: data.representation || 'storage'
+      }
+    };
+  }
+  
+  return client.request<PageResponse>('PUT', `/content/${pageId}`, payload);
 }
 
 /**
@@ -122,9 +154,9 @@ export async function deletePage(
 ): Promise<void> {
   const params = new URLSearchParams();
   if (options?.purge) params.set('purge', 'true');
-
+  
   const query = params.toString();
-  await client.request<void>('DELETE', `/pages/${pageId}${query ? `?${query}` : ''}`);
+  await client.request<void>('DELETE', `/content/${pageId}${query ? `?${query}` : ''}`);
 }
 
 /**
@@ -142,9 +174,9 @@ export async function getPageAttachments(
 ): Promise<AttachmentsListResponse> {
   const params = new URLSearchParams();
   if (limit) params.set('limit', limit.toString());
-
+  
   const query = params.toString();
-  return client.request<AttachmentsListResponse>('GET', `/pages/${pageId}/attachments${query ? `?${query}` : ''}`);
+  return client.request<AttachmentsListResponse>('GET', `/content/${pageId}/child/attachment${query ? `?${query}` : ''}`);
 }
 
 /**
@@ -162,7 +194,7 @@ export async function getPageComments(
 ): Promise<CommentsListResponse> {
   const params = new URLSearchParams();
   if (limit) params.set('limit', limit.toString());
-
+  
   const query = params.toString();
-  return client.request<CommentsListResponse>('GET', `/pages/${pageId}/comments${query ? `?${query}` : ''}`);
+  return client.request<CommentsListResponse>('GET', `/content/${pageId}/child/comment${query ? `?${query}` : ''}`);
 }

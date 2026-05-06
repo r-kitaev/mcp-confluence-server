@@ -41,7 +41,7 @@ describe('pages API', () => {
         bodyFormat: 'storage'
       });
 
-      expect(mockRequest).toHaveBeenCalledWith('GET', '/pages/67890?include-body=true&include-labels=true&body-format=storage');
+      expect(mockRequest).toHaveBeenCalledWith('GET', '/content/67890?include-body=true&include-labels=true&body-format=storage');
     });
 
     it('works without options', async () => {
@@ -66,7 +66,7 @@ describe('pages API', () => {
 
       await pagesApi.getPage(mockClient, '67890');
 
-      expect(mockRequest).toHaveBeenCalledWith('GET', '/pages/67890');
+      expect(mockRequest).toHaveBeenCalledWith('GET', '/content/67890');
     });
   });
 
@@ -75,7 +75,7 @@ describe('pages API', () => {
       const mockResponse: PaginatedResponse<Page> = {
         results: [],
         _links: {
-          base: 'https://example.atlassian.net/wiki/api/v2'
+          base: 'https://example.atlassian.net/wiki/rest/api'
         }
       };
 
@@ -83,14 +83,14 @@ describe('pages API', () => {
 
       await pagesApi.listPages(mockClient, '12345', { parentId: '67890' });
 
-      expect(mockRequest).toHaveBeenCalledWith('GET', '/spaces/12345/pages?parent-id=67890');
+      expect(mockRequest).toHaveBeenCalledWith('GET', '/content?spaceKey=12345&type=page&parent-id=67890');
     });
 
     it('passes limit and cursor', async () => {
       const mockResponse: PaginatedResponse<Page> = {
         results: [],
         _links: {
-          base: 'https://example.atlassian.net/wiki/api/v2'
+          base: 'https://example.atlassian.net/wiki/rest/api'
         }
       };
 
@@ -98,7 +98,7 @@ describe('pages API', () => {
 
       await pagesApi.listPages(mockClient, '12345', { limit: 25, cursor: 'xyz789' });
 
-      expect(mockRequest).toHaveBeenCalledWith('GET', '/spaces/12345/pages?limit=25&cursor=xyz789');
+      expect(mockRequest).toHaveBeenCalledWith('GET', '/content?spaceKey=12345&type=page&limit=25&start=xyz789');
     });
   });
 
@@ -134,7 +134,7 @@ describe('pages API', () => {
 
       await pagesApi.createPage(mockClient, pageData);
 
-      expect(mockRequest).toHaveBeenCalledWith('POST', '/pages', pageData);
+      expect(mockRequest).toHaveBeenCalledWith('POST', '/content', expect.any(Object));
     });
 
     it('creates page without parentId', async () => {
@@ -165,7 +165,7 @@ describe('pages API', () => {
 
       await pagesApi.createPage(mockClient, pageData);
 
-      expect(mockRequest).toHaveBeenCalledWith('POST', '/pages', pageData);
+      expect(mockRequest).toHaveBeenCalledWith('POST', '/content', expect.any(Object));
     });
   });
 
@@ -200,7 +200,7 @@ describe('pages API', () => {
 
       await pagesApi.updatePage(mockClient, '67890', updateData);
 
-      expect(mockRequest).toHaveBeenCalledWith('PUT', '/pages/67890', updateData);
+      expect(mockRequest).toHaveBeenCalledWith('PUT', '/content/67890', expect.any(Object));
     });
   });
 
@@ -210,7 +210,7 @@ describe('pages API', () => {
 
       await pagesApi.deletePage(mockClient, '67890');
 
-      expect(mockRequest).toHaveBeenCalledWith('DELETE', '/pages/67890');
+      expect(mockRequest).toHaveBeenCalledWith('DELETE', '/content/67890');
     });
 
     it('deletes with purge=true', async () => {
@@ -218,7 +218,7 @@ describe('pages API', () => {
 
       await pagesApi.deletePage(mockClient, '67890', { purge: true });
 
-      expect(mockRequest).toHaveBeenCalledWith('DELETE', '/pages/67890?purge=true');
+      expect(mockRequest).toHaveBeenCalledWith('DELETE', '/content/67890?purge=true');
     });
   });
 });

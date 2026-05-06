@@ -29,7 +29,7 @@ export async function search(
   params.set('cql', cql);
   
   if (options?.limit) params.set('limit', options.limit.toString());
-  if (options?.cursor) params.set('cursor', options.cursor);
+  if (options?.cursor) params.set('start', options.cursor);
   if (options?.includeHighlighting) params.set('highlight', 'true');
 
   const query = params.toString();

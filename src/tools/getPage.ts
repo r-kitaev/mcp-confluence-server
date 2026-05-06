@@ -33,17 +33,21 @@ export function registerGetPageTool(server: McpServer, client: ConfluenceClient)
         const result: Record<string, unknown> = {
           id: page.id,
           title: page.title,
-          spaceId: page.spaceId,
-          parentId: page.parentId,
-          version: page.version.number,
-          createdAt: page.createdAt,
-          updatedAt: page.version.createdAt,
-          webUrl: page._links.webui,
-          editUrl: page._links.editui
+          version: (page as any).version?.number || 1,
+          webUrl: page._links.webui
         };
         
+        if ((page as any).space?.key) {
+          result.spaceId = (page as any).space.key;
+        }
+        
+        if ((page as any).ancestors && (page as any).ancestors.length > 0) {
+          result.parentId = (page as any).ancestors[0].id;
+        }
+        
         if (args.includeBody) {
-          result.body = 'Body content available (implement body retrieval)';
+          const bodyData = (page as any).body?.storage?.value || (page as any).body?.view?.value;
+          result.body = bodyData || 'No body content';
         }
         
         if (args.includeLabels) {

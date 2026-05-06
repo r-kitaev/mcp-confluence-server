@@ -26,10 +26,10 @@ describe('ConfluenceClient', () => {
   });
 
   describe('initialization', () => {
-    it('initializes with correct baseUrl and auth', () => {
+    it('initializes with correct baseUrl and auth token', () => {
       const testClient = new ConfluenceClient(config);
-      expect((testClient as any).baseUrl).toBe('https://example.atlassian.net/wiki/api/v2');
-      expect((testClient as any).authHeader).toBeDefined();
+      expect((testClient as any).baseUrl).toBe('https://example.atlassian.net/wiki/rest/api');
+      expect((testClient as any).apiToken).toBe('test_token');
     });
 
     it('handles baseUrl with trailing slash', () => {
@@ -37,7 +37,7 @@ describe('ConfluenceClient', () => {
         ...config,
         baseUrl: 'https://example.atlassian.net/wiki/'
       });
-      expect((testClient as any).baseUrl).toBe('https://example.atlassian.net/wiki/api/v2');
+      expect((testClient as any).baseUrl).toBe('https://example.atlassian.net/wiki/rest/api');
     });
   });
 
@@ -64,28 +64,27 @@ describe('ConfluenceClient', () => {
 
   describe('retry logic', () => {
     it('retries on 429 with exponential backoff', async () => {
-      mockFetch
-        .mockResolvedValueOnce({
-          status: 429,
-          ok: false,
-          headers: {
-            get: () => '1'
-          },
-          text: async () => 'Rate limit exceeded'
-        })
-        .mockResolvedValueOnce({
-          status: 200,
-          ok: true,
-          headers: {
-            get: (name: string) => {
-              if (name === 'Content-Type') return 'application/json';
-              return null;
-            }
-          },
-          json: async () => ({ results: [] })
-        });
+      mockFetch.mockResolvedValue({
+        status: 429,
+        ok: false,
+        headers: {
+          get: () => '1'
+        },
+        text: async () => 'Rate limit exceeded'
+      });
+      mockFetch.mockResolvedValue({
+        status: 200,
+        ok: true,
+        headers: {
+          get: (name: string) => {
+            if (name === 'Content-Type') return 'application/json';
+            return null;
+          }
+        },
+        json: async () => ({ results: [] })
+      });
 
-      const result = await client.request('GET', '/spaces');
+      const result = await client.request('GET', '/space');
 
       expect(mockFetch).toHaveBeenCalledTimes(2);
       expect(result).toEqual({ results: [] });
@@ -106,7 +105,7 @@ describe('ConfluenceClient', () => {
           json: async () => ({ success: true })
         });
 
-      const result = await client.request('GET', '/spaces');
+      const result = await client.request('GET', '/space');
 
       expect(mockFetch).toHaveBeenCalledTimes(2);
       expect(result).toEqual({ success: true });
@@ -115,7 +114,7 @@ describe('ConfluenceClient', () => {
     it('throws after max retries', async () => {
       mockFetch.mockRejectedValue(new Error('Network error'));
 
-      await expect(client.request('GET', '/spaces')).rejects.toThrow('Network error');
+      await expect(client.request('GET', '/space')).rejects.toThrow('Network error');
       expect(mockFetch).toHaveBeenCalledTimes(3);
     });
   });
@@ -169,7 +168,7 @@ describe('ConfluenceClient', () => {
       });
 
       try {
-        await client.request('GET', '/spaces');
+        await client.request('GET', '/space');
       } catch (error) {
         expect(error).toBeInstanceOf(ConfluenceAPIError);
       }

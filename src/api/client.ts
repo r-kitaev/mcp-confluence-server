@@ -3,16 +3,15 @@ import { ConfluenceAPIError } from '../types.js';
 
 export class ConfluenceClient {
   protected baseUrl: string;
-  protected authHeader: string;
+  protected apiToken: string;
   private rateLimitRemaining: number = 65000;
   private rateLimitReset: number = 0;
 
   constructor(config: ConfluenceConfig) {
     const cleanUrl = config.baseUrl.replace(/\/$/, '');
-    this.baseUrl = `${cleanUrl}/api/v2`;
-
-    const credentials = `${config.email}:${config.apiToken}`;
-    this.authHeader = Buffer.from(credentials).toString('base64');
+    // Use /rest/api for on-premise Confluence, /api/v2 for Cloud
+    this.baseUrl = `${cleanUrl}/rest/api`;
+    this.apiToken = config.apiToken;
   }
 
   private sleep(ms: number): Promise<void> {
@@ -35,7 +34,7 @@ export class ConfluenceClient {
         }
 
         const requestHeaders: Record<string, string> = {
-          'Authorization': `Basic ${this.authHeader}`,
+          'Authorization': `Bearer ${this.apiToken}`,
           'Accept': 'application/json'
         };
 
@@ -116,7 +115,7 @@ export class ConfluenceClient {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'Authorization': `Basic ${this.authHeader}`,
+        'Authorization': `Bearer ${this.apiToken}`,
         'Accept': '*/*'
       }
     });

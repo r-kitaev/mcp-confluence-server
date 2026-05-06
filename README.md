@@ -1,6 +1,6 @@
 # MCP Confluence Server
 
-MCP server for working with Confluence Cloud via REST API v2.
+MCP server for working with Confluence Cloud and Data Center via REST API v1.
 
 ## Installation
 
@@ -24,21 +24,22 @@ npm run start:stdio
 
 ## Configuration
 
-Copy the example environment file and fill in your Confluence Cloud credentials:
+Copy the example environment file and fill in your Confluence credentials:
 
 ```bash
 cp .env.example .env
 ```
 
 Required environment variables:
-- `CONFLUENCE_BASE_URL` - Your Confluence Cloud URL (e.g., `https://your-company.atlassian.net/wiki`)
-- `CONFLUENCE_EMAIL` - Your Atlassian account email
-- `CONFLUENCE_API_TOKEN` - Your API token from Atlassian
+- `CONFLUENCE_BASE_URL` - Your Confluence URL (e.g., `https://your-company.atlassian.net/wiki` or on-premise URL)
+- `CONFLUENCE_EMAIL` - Your account email
+- `CONFLUENCE_API_TOKEN` - Your API token or Personal Access Token
 
 Optional environment variables:
 - `MCP_SERVER_TOKEN` - Secure token for HTTP transport
 - `PORT` - Port for HTTP server (default: 3000)
 - `ALLOWED_ORIGINS` - Allowed origins for HTTP transport
+- `NODE_TLS_REJECT_UNAUTHORIZED` - Set to `0` for self-signed certificates (on-premise)
 
 ## Usage
 
@@ -89,8 +90,8 @@ npm run dev
 
 ```
 ┌─────────────┐      ┌──────────────────────────────────────┐      ┌──────────────────┐      ┌─────────────────────────┐
-│ MCP Client  │ ──→  │  McpServer                           │ ──→  │ ConfluenceClient │ ──→  │ Confluence Cloud REST   │
-│ (AI/IDE)    │      │  Tools: 8                            │      │ (API wrapper)    │      │ API v2                  │
+│ MCP Client  │ ──→  │  McpServer                           │ ──→  │ ConfluenceClient │ ──→  │ Confluence REST API v1  │
+│ (AI/IDE)    │      │  Tools: 8                            │      │ (API wrapper)    │      │                         │
 │             │      │  Resources: 3                        │      │                  │      │                         │
 │             │      │  Prompts: 2                          │      │                  │      │                         │
 └─────────────┘      └──────────────────────────────────────┘      └──────────────────┘      └─────────────────────────┘
@@ -99,8 +100,17 @@ npm run dev
 **Components**:
 - **MCP Client**: AI assistant or IDE that connects to the server
 - **McpServer**: Main server exposing tools, resources, and prompts
-- **ConfluenceClient**: HTTP client for Confluence Cloud REST API v2
-- **Confluence Cloud API**: Atlassian's REST API for Confluence Cloud
+- **ConfluenceClient**: HTTP client for Confluence REST API v1 with Bearer token auth
+- **Confluence REST API**: Atlassian's REST API v1 for Confluence Cloud and Data Center
+
+## API Compatibility
+
+This server uses **Confluence REST API v1** (`/rest/api`) which is compatible with:
+- Confluence Cloud
+- Confluence Data Center
+- Confluence Server (on-premise)
+
+**Authentication**: Bearer Token (Personal Access Token or API Token)
 
 ## Testing
 

@@ -8,7 +8,7 @@ import type { UserResponse, UsersListResponse } from '../types.js';
  * @throws ConfluenceAPIError при ошибке API
  */
 export async function getCurrentUser(client: ConfluenceClient): Promise<UserResponse> {
-  return client.request<UserResponse>('GET', '/users/me');
+  return client.request<UserResponse>('GET', '/user/current');
 }
 
 /**
@@ -22,7 +22,9 @@ export async function getUserByEmail(
   client: ConfluenceClient,
   email: string
 ): Promise<UserResponse> {
-  return client.request<UserResponse>('POST', '/user/access/check-access-by-email', { email });
+  const params = new URLSearchParams();
+  params.set('email', email);
+  return client.request<UserResponse>('GET', `/user/anonymous?${params.toString()}`);
 }
 
 /**
@@ -36,7 +38,9 @@ export async function bulkGetUsers(
   client: ConfluenceClient,
   userIds: string[]
 ): Promise<UsersListResponse> {
-  return client.request<UsersListResponse>('POST', '/users-bulk', { accountIds: userIds });
+  const params = new URLSearchParams();
+  userIds.forEach(id => params.append('accountId', id));
+  return client.request<UsersListResponse>('GET', `/users/bulk?${params.toString()}`);
 }
 
 /**
@@ -47,8 +51,8 @@ export async function bulkGetUsers(
  * @throws ConfluenceAPIError при ошибке API
  */
 export async function inviteUser(
-  client: ConfluenceClient,
-  email: string
+  _client: ConfluenceClient,
+  _email: string
 ): Promise<UserResponse> {
-  return client.request<UserResponse>('POST', '/user/access/invite-by-email', { email });
+  throw new Error('inviteUser not supported in REST API v1');
 }

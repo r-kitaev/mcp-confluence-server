@@ -34,11 +34,11 @@ export function registerListPagesTool(server: McpServer, client: ConfluenceClien
         const pages = response.results.map(page => ({
           id: page.id,
           title: page.title,
-          spaceId: page.spaceId,
-          parentId: page.parentId,
-          position: page.position,
-          createdAt: page.createdAt,
-          version: page.version.number,
+          spaceId: (page as any).space?._links?.self || '',
+          parentId: (page as any).ancestors?.[0]?.id,
+          position: (page as any).extensions?.position || 0,
+          createdAt: (page as any).history?.createdAt || (page as any).version?.createdAt || '',
+          version: (page as any).version?.number || 1,
           webUrl: page._links.webui
         }));
         

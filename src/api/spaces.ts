@@ -21,7 +21,7 @@ export interface ListSpacesOptions {
  * @throws ConfluenceAPIError при ошибке API
  */
 export async function getSpace(client: ConfluenceClient, spaceId: string): Promise<SpaceResponse> {
-  return client.request<SpaceResponse>('GET', `/spaces/${spaceId}`);
+  return client.request<SpaceResponse>('GET', `/space/${spaceId}`);
 }
 
 /**
@@ -40,7 +40,7 @@ export async function listSpaces(
   if (options?.cursor) params.set('cursor', options.cursor);
 
   const query = params.toString();
-  return client.request<SpacesListResponse>('GET', `/spaces${query ? `?${query}` : ''}`);
+  return client.request<SpacesListResponse>('GET', `/space${query ? `?${query}` : ''}`);
 }
 
 /**
@@ -54,7 +54,7 @@ export async function createSpace(
   client: ConfluenceClient,
   data: CreateSpaceData
 ): Promise<SpaceResponse> {
-  return client.request<SpaceResponse>('POST', '/spaces', data);
+  return client.request<SpaceResponse>('POST', '/space', data);
 }
 
 /**
@@ -68,5 +68,5 @@ export async function getSpacePermissions(
   client: ConfluenceClient,
   spaceId: string
 ): Promise<PermissionsResponse> {
-  return client.request<PermissionsResponse>('GET', `/spaces/${spaceId}/permissions`);
+  return client.request<PermissionsResponse>('GET', `/space/${spaceId}/permissions`);
 }

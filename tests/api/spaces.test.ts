@@ -33,7 +33,7 @@ describe('spaces API', () => {
 
       const result = await spacesApi.getSpace(mockClient, 'TEST');
 
-      expect(mockRequest).toHaveBeenCalledWith('GET', '/spaces/TEST');
+      expect(mockRequest).toHaveBeenCalledWith('GET', '/space/TEST');
       expect(result).toEqual(mockSpace);
     });
   });
@@ -43,7 +43,7 @@ describe('spaces API', () => {
       const mockResponse: PaginatedResponse<Space> = {
         results: [],
         _links: {
-          base: 'https://example.atlassian.net/wiki/api/v2'
+          base: 'https://example.atlassian.net/wiki/rest/api'
         }
       };
 
@@ -51,14 +51,14 @@ describe('spaces API', () => {
 
       await spacesApi.listSpaces(mockClient, { limit: 50, cursor: 'abc123' });
 
-      expect(mockRequest).toHaveBeenCalledWith('GET', '/spaces?limit=50&cursor=abc123');
+      expect(mockRequest).toHaveBeenCalledWith('GET', '/space?limit=50&cursor=abc123');
     });
 
     it('works without options', async () => {
       const mockResponse: PaginatedResponse<Space> = {
         results: [],
         _links: {
-          base: 'https://example.atlassian.net/wiki/api/v2'
+          base: 'https://example.atlassian.net/wiki/rest/api'
         }
       };
 
@@ -66,7 +66,7 @@ describe('spaces API', () => {
 
       await spacesApi.listSpaces(mockClient);
 
-      expect(mockRequest).toHaveBeenCalledWith('GET', '/spaces');
+      expect(mockRequest).toHaveBeenCalledWith('GET', '/space');
     });
   });
 
@@ -96,7 +96,7 @@ describe('spaces API', () => {
 
       await spacesApi.createSpace(mockClient, spaceData);
 
-      expect(mockRequest).toHaveBeenCalledWith('POST', '/spaces', spaceData);
+      expect(mockRequest).toHaveBeenCalledWith('POST', '/space', spaceData);
     });
   });
 
@@ -105,7 +105,7 @@ describe('spaces API', () => {
       const mockPermissions = {
         results: [],
         _links: {
-          base: 'https://example.atlassian.net/wiki/api/v2'
+          base: 'https://example.atlassian.net/wiki/rest/api'
         }
       };
 
@@ -113,7 +113,7 @@ describe('spaces API', () => {
 
       await spacesApi.getSpacePermissions(mockClient, '12345');
 
-      expect(mockRequest).toHaveBeenCalledWith('GET', '/spaces/12345/permissions');
+      expect(mockRequest).toHaveBeenCalledWith('GET', '/space/12345/permissions');
     });
   });
 });

@@ -70,7 +70,7 @@ export async function uploadAttachment(
   const footerBuffer = Buffer.from('\r\n--' + boundary + '--\r\n', 'utf-8');
   const body = Buffer.concat([headerBuffer, file.content, footerBuffer]);
 
-  return client.request<AttachmentResponse>('POST', `/pages/${pageId}/attachment`, body, {
+  return client.request<AttachmentResponse>('POST', `/content/${pageId}/child/attachment`, body, {
     'Content-Type': `multipart/form-data; boundary=${boundary}`
   });
 }
