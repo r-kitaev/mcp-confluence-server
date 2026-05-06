@@ -1,5 +1,5 @@
 import type { ConfluenceClient } from './client.js';
-import type { PageResponse, PagesListResponse, CommentsListResponse, AttachmentsListResponse } from '../types.js';
+import type { PageResponse, PagesListResponse, CommentsListResponse, AttachmentsListResponse, PageWithBody } from '../types.js';
 
 export interface GetPageOptions {
   includeBody?: boolean;
@@ -38,21 +38,21 @@ export interface DeletePageOptions {
  * @param client - экземпляр ConfluenceClient
  * @param pageId - ID страницы
  * @param options - опции: includeBody, includeLabels, bodyFormat
- * @returns Promise с объектом Page
+ * @returns Promise с объектом Page или PageWithBody (если includeBody=true)
  * @throws ConfluenceAPIError при ошибке API
  */
 export async function getPage(
   client: ConfluenceClient,
   pageId: string,
   options?: GetPageOptions
-): Promise<PageResponse> {
+): Promise<PageResponse | PageWithBody> {
   const params = new URLSearchParams();
   if (options?.includeBody) params.set('include-body', 'true');
   if (options?.includeLabels) params.set('include-labels', 'true');
   if (options?.bodyFormat) params.set('body-format', options.bodyFormat);
 
   const query = params.toString();
-  return client.request<PageResponse>('GET', `/pages/${pageId}${query ? `?${query}` : ''}`);
+  return client.request<PageResponse | PageWithBody>('GET', `/pages/${pageId}${query ? `?${query}` : ''}`);
 }
 
 /**

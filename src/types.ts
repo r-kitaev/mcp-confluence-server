@@ -54,6 +54,20 @@ export interface Page {
   };
 }
 
+export interface PageWithBody extends Page {
+  body?: {
+    storage?: {
+      value: string;
+    };
+    view?: {
+      value: string;
+    };
+    atlas_doc_format?: {
+      value: string;
+    };
+  };
+}
+
 export interface BlogPost {
   id: string;
   title: string;
