@@ -22,8 +22,8 @@ export function registerPageAttachmentsResource(server: McpServer, client: Confl
         const pageId = paramsRecord.pageId as string;
         const response = await getPageAttachments(client, pageId, 50);
 
-        const attachments = response.results?.map((attachment: unknown) => {
-          const att = attachment as Record<string, unknown>;
+        const attachments = response.results?.map((attachment) => {
+          const att = attachment as unknown as Record<string, unknown>;
           const links = att._links as Record<string, unknown> | undefined;
           return {
             id: att.id as string,

@@ -26,11 +26,11 @@ export function registerSpaceResource(server: McpServer, client: ConfluenceClien
         const { spaceId } = ParamsSchema.parse(params);
         const space = await getSpace(client, spaceId);
 
-        const spaceData: Record<string, unknown> = {
+        const spaceData = {
           key: space.key,
           name: space.name,
-          description: (space as Record<string, unknown>).description,
-          homepageId: (space as Record<string, unknown>).homepageId,
+          description: (space as unknown as Record<string, unknown>).description,
+          homepageId: (space as unknown as Record<string, unknown>).homepageId,
           createdAt: space.createdAt,
           webUrl: space._links.webui
         };

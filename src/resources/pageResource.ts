@@ -26,8 +26,8 @@ export function registerPageResource(server: McpServer, client: ConfluenceClient
           bodyFormat: 'view'
         });
 
-        const pageBody = page as Record<string, unknown>;
-        const body = pageBody.body as Record<string, unknown> | undefined;
+        const pageRecord = page as unknown as Record<string, unknown>;
+        const body = pageRecord.body as Record<string, unknown> | undefined;
         const viewBody = body?.view as Record<string, unknown> | undefined;
         const storageBody = body?.storage as Record<string, unknown> | undefined;
         const bodyContent = (viewBody?.value as string) || (storageBody?.value as string) || '';
