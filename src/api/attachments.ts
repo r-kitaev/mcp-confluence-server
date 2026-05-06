@@ -1,4 +1,5 @@
 import type { ConfluenceClient } from './client.js';
+import type { AttachmentResponse } from '../types.js';
 
 export interface UploadAttachmentData {
   filename: string;
@@ -16,8 +17,8 @@ export interface UploadAttachmentData {
 export async function getAttachment(
   client: ConfluenceClient,
   attachmentId: string
-): Promise<any> {
-  return client.request<any>('GET', `/attachments/${attachmentId}`);
+): Promise<AttachmentResponse> {
+  return client.request<AttachmentResponse>('GET', `/attachments/${attachmentId}`);
 }
 
 /**
@@ -31,21 +32,7 @@ export async function downloadAttachment(
   client: ConfluenceClient,
   attachmentId: string
 ): Promise<Buffer> {
-  const url = `${(client as any).baseUrl}/attachments/${attachmentId}/download`;
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Basic ${(client as any).authHeader}`
-    }
-  });
-
-  if (!response.ok) {
-    const errorBody = await response.text();
-    throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorBody}`);
-  }
-
-  const arrayBuffer = await response.arrayBuffer();
-  return Buffer.from(arrayBuffer);
+  return client.downloadBinary(`/attachments/${attachmentId}/download`);
 }
 
 /**
@@ -62,7 +49,7 @@ export async function uploadAttachment(
   pageId: string,
   file: UploadAttachmentData,
   comment?: string
-): Promise<any> {
+): Promise<AttachmentResponse> {
   const boundary = '----WebKitFormBoundary' + Math.random().toString(36).slice(2);
   
   const headerParts = [
@@ -83,7 +70,7 @@ export async function uploadAttachment(
   const footerBuffer = Buffer.from('\r\n--' + boundary + '--\r\n', 'utf-8');
   const body = Buffer.concat([headerBuffer, file.content, footerBuffer]);
 
-  return client.request<any>('POST', `/pages/${pageId}/attachment`, body, {
+  return client.request<AttachmentResponse>('POST', `/pages/${pageId}/attachment`, body, {
     'Content-Type': `multipart/form-data; boundary=${boundary}`
   });
 }
@@ -102,7 +89,7 @@ export async function updateAttachment(
   attachmentId: string,
   file: UploadAttachmentData,
   comment?: string
-): Promise<any> {
+): Promise<AttachmentResponse> {
   const boundary = '----WebKitFormBoundary' + Math.random().toString(36).slice(2);
   
   const headerParts = [
@@ -123,7 +110,7 @@ export async function updateAttachment(
   const footerBuffer = Buffer.from('\r\n--' + boundary + '--\r\n', 'utf-8');
   const body = Buffer.concat([headerBuffer, file.content, footerBuffer]);
 
-  return client.request<any>('PUT', `/attachments/${attachmentId}/data`, body, {
+  return client.request<AttachmentResponse>('PUT', `/attachments/${attachmentId}/data`, body, {
     'Content-Type': `multipart/form-data; boundary=${boundary}`
   });
 }

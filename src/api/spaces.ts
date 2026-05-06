@@ -1,5 +1,5 @@
 import type { ConfluenceClient } from './client.js';
-import type { Space, PaginatedResponse } from '../types.js';
+import type { SpaceResponse, SpacesListResponse, PermissionsResponse } from '../types.js';
 
 export interface CreateSpaceData {
   key: string;
@@ -20,8 +20,8 @@ export interface ListSpacesOptions {
  * @returns Promise с объектом Space
  * @throws ConfluenceAPIError при ошибке API
  */
-export async function getSpace(client: ConfluenceClient, spaceId: string): Promise<Space> {
-  return client.request<Space>('GET', `/spaces/${spaceId}`);
+export async function getSpace(client: ConfluenceClient, spaceId: string): Promise<SpaceResponse> {
+  return client.request<SpaceResponse>('GET', `/spaces/${spaceId}`);
 }
 
 /**
@@ -34,13 +34,13 @@ export async function getSpace(client: ConfluenceClient, spaceId: string): Promi
 export async function listSpaces(
   client: ConfluenceClient,
   options?: ListSpacesOptions
-): Promise<PaginatedResponse<Space>> {
+): Promise<SpacesListResponse> {
   const params = new URLSearchParams();
   if (options?.limit) params.set('limit', options.limit.toString());
   if (options?.cursor) params.set('cursor', options.cursor);
 
   const query = params.toString();
-  return client.request<PaginatedResponse<Space>>('GET', `/spaces${query ? `?${query}` : ''}`);
+  return client.request<SpacesListResponse>('GET', `/spaces${query ? `?${query}` : ''}`);
 }
 
 /**
@@ -53,8 +53,8 @@ export async function listSpaces(
 export async function createSpace(
   client: ConfluenceClient,
   data: CreateSpaceData
-): Promise<Space> {
-  return client.request<Space>('POST', '/spaces', data);
+): Promise<SpaceResponse> {
+  return client.request<SpaceResponse>('POST', '/spaces', data);
 }
 
 /**
@@ -67,6 +67,6 @@ export async function createSpace(
 export async function getSpacePermissions(
   client: ConfluenceClient,
   spaceId: string
-): Promise<any> {
-  return client.request<any>('GET', `/spaces/${spaceId}/permissions`);
+): Promise<PermissionsResponse> {
+  return client.request<PermissionsResponse>('GET', `/spaces/${spaceId}/permissions`);
 }

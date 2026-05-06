@@ -2,8 +2,8 @@ import type { ConfluenceConfig } from '../types.js';
 import { ConfluenceAPIError } from '../types.js';
 
 export class ConfluenceClient {
-  private baseUrl: string;
-  private authHeader: string;
+  protected baseUrl: string;
+  protected authHeader: string;
   private rateLimitRemaining: number = 65000;
   private rateLimitReset: number = 0;
 
@@ -109,5 +109,27 @@ export class ConfluenceClient {
     }
 
     throw lastError || new Error('Request failed after all retries');
+  }
+
+  async downloadBinary(endpoint: string): Promise<Buffer> {
+    const url = `${this.baseUrl}${endpoint}`;
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Basic ${this.authHeader}`,
+        'Accept': '*/*'
+      }
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      throw new ConfluenceAPIError(
+        errorBody || `HTTP ${response.status}: ${response.statusText}`,
+        response.status
+      );
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+    return Buffer.from(arrayBuffer);
   }
 }

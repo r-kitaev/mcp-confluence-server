@@ -1,5 +1,5 @@
 import type { ConfluenceClient } from './client.js';
-import type { PaginatedResponse } from '../types.js';
+import type { BlogPostResponse, BlogPostsListResponse } from '../types.js';
 
 export interface GetBlogPostOptions {
   includeBody?: boolean;
@@ -36,13 +36,13 @@ export async function getBlogPost(
   client: ConfluenceClient,
   blogPostId: string,
   options?: GetBlogPostOptions
-): Promise<any> {
+): Promise<BlogPostResponse> {
   const params = new URLSearchParams();
   if (options?.includeBody) params.set('include-body', 'true');
   if (options?.bodyFormat) params.set('body-format', options.bodyFormat);
 
   const query = params.toString();
-  return client.request<any>('GET', `/blogposts/${blogPostId}${query ? `?${query}` : ''}`);
+  return client.request<BlogPostResponse>('GET', `/blogposts/${blogPostId}${query ? `?${query}` : ''}`);
 }
 
 /**
@@ -57,14 +57,14 @@ export async function listBlogPosts(
   client: ConfluenceClient,
   spaceId?: string,
   options?: ListBlogPostsOptions
-): Promise<PaginatedResponse<any>> {
+): Promise<BlogPostsListResponse> {
   const params = new URLSearchParams();
   if (spaceId) params.set('space-id', spaceId);
   if (options?.limit) params.set('limit', options.limit.toString());
   if (options?.cursor) params.set('cursor', options.cursor);
 
   const query = params.toString();
-  return client.request<PaginatedResponse<any>>('GET', `/blogposts${query ? `?${query}` : ''}`);
+  return client.request<BlogPostsListResponse>('GET', `/blogposts${query ? `?${query}` : ''}`);
 }
 
 /**
@@ -77,8 +77,8 @@ export async function listBlogPosts(
 export async function createBlogPost(
   client: ConfluenceClient,
   data: CreateBlogPostData
-): Promise<any> {
-  return client.request<any>('POST', '/blogposts', data);
+): Promise<BlogPostResponse> {
+  return client.request<BlogPostResponse>('POST', '/blogposts', data);
 }
 
 /**
@@ -93,8 +93,8 @@ export async function updateBlogPost(
   client: ConfluenceClient,
   blogPostId: string,
   data: UpdateBlogPostData
-): Promise<any> {
-  return client.request<any>('PUT', `/blogposts/${blogPostId}`, data);
+): Promise<BlogPostResponse> {
+  return client.request<BlogPostResponse>('PUT', `/blogposts/${blogPostId}`, data);
 }
 
 /**

@@ -1,5 +1,5 @@
 import type { ConfluenceClient } from './client.js';
-import type { Page, PaginatedResponse } from '../types.js';
+import type { PageResponse, PagesListResponse, CommentsListResponse, AttachmentsListResponse } from '../types.js';
 
 export interface GetPageOptions {
   includeBody?: boolean;
@@ -45,14 +45,14 @@ export async function getPage(
   client: ConfluenceClient,
   pageId: string,
   options?: GetPageOptions
-): Promise<Page> {
+): Promise<PageResponse> {
   const params = new URLSearchParams();
   if (options?.includeBody) params.set('include-body', 'true');
   if (options?.includeLabels) params.set('include-labels', 'true');
   if (options?.bodyFormat) params.set('body-format', options.bodyFormat);
 
   const query = params.toString();
-  return client.request<Page>('GET', `/pages/${pageId}${query ? `?${query}` : ''}`);
+  return client.request<PageResponse>('GET', `/pages/${pageId}${query ? `?${query}` : ''}`);
 }
 
 /**
@@ -67,14 +67,14 @@ export async function listPages(
   client: ConfluenceClient,
   spaceId: string,
   options?: ListPagesOptions
-): Promise<PaginatedResponse<Page>> {
+): Promise<PagesListResponse> {
   const params = new URLSearchParams();
   if (options?.parentId) params.set('parent-id', options.parentId);
   if (options?.limit) params.set('limit', options.limit.toString());
   if (options?.cursor) params.set('cursor', options.cursor);
 
   const query = params.toString();
-  return client.request<PaginatedResponse<Page>>('GET', `/spaces/${spaceId}/pages${query ? `?${query}` : ''}`);
+  return client.request<PagesListResponse>('GET', `/spaces/${spaceId}/pages${query ? `?${query}` : ''}`);
 }
 
 /**
@@ -87,8 +87,8 @@ export async function listPages(
 export async function createPage(
   client: ConfluenceClient,
   data: CreatePageData
-): Promise<Page> {
-  return client.request<Page>('POST', '/pages', data);
+): Promise<PageResponse> {
+  return client.request<PageResponse>('POST', '/pages', data);
 }
 
 /**
@@ -103,8 +103,8 @@ export async function updatePage(
   client: ConfluenceClient,
   pageId: string,
   data: UpdatePageData
-): Promise<Page> {
-  return client.request<Page>('PUT', `/pages/${pageId}`, data);
+): Promise<PageResponse> {
+  return client.request<PageResponse>('PUT', `/pages/${pageId}`, data);
 }
 
 /**
@@ -139,12 +139,12 @@ export async function getPageAttachments(
   client: ConfluenceClient,
   pageId: string,
   limit?: number
-): Promise<any> {
+): Promise<AttachmentsListResponse> {
   const params = new URLSearchParams();
   if (limit) params.set('limit', limit.toString());
 
   const query = params.toString();
-  return client.request<any>('GET', `/pages/${pageId}/attachments${query ? `?${query}` : ''}`);
+  return client.request<AttachmentsListResponse>('GET', `/pages/${pageId}/attachments${query ? `?${query}` : ''}`);
 }
 
 /**
@@ -159,10 +159,10 @@ export async function getPageComments(
   client: ConfluenceClient,
   pageId: string,
   limit?: number
-): Promise<any> {
+): Promise<CommentsListResponse> {
   const params = new URLSearchParams();
   if (limit) params.set('limit', limit.toString());
 
   const query = params.toString();
-  return client.request<any>('GET', `/pages/${pageId}/comments${query ? `?${query}` : ''}`);
+  return client.request<CommentsListResponse>('GET', `/pages/${pageId}/comments${query ? `?${query}` : ''}`);
 }

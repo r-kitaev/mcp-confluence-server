@@ -1,4 +1,5 @@
 import type { ConfluenceClient } from './client.js';
+import type { UserResponse, UsersListResponse } from '../types.js';
 
 /**
  * Получить данные текущего пользователя
@@ -6,8 +7,8 @@ import type { ConfluenceClient } from './client.js';
  * @returns Promise с объектом User
  * @throws ConfluenceAPIError при ошибке API
  */
-export async function getCurrentUser(client: ConfluenceClient): Promise<any> {
-  return client.request<any>('GET', '/users/me');
+export async function getCurrentUser(client: ConfluenceClient): Promise<UserResponse> {
+  return client.request<UserResponse>('GET', '/users/me');
 }
 
 /**
@@ -20,8 +21,8 @@ export async function getCurrentUser(client: ConfluenceClient): Promise<any> {
 export async function getUserByEmail(
   client: ConfluenceClient,
   email: string
-): Promise<any> {
-  return client.request<any>('POST', '/user/access/check-access-by-email', { email });
+): Promise<UserResponse> {
+  return client.request<UserResponse>('POST', '/user/access/check-access-by-email', { email });
 }
 
 /**
@@ -34,8 +35,8 @@ export async function getUserByEmail(
 export async function bulkGetUsers(
   client: ConfluenceClient,
   userIds: string[]
-): Promise<any> {
-  return client.request<any>('POST', '/users-bulk', { accountIds: userIds });
+): Promise<UsersListResponse> {
+  return client.request<UsersListResponse>('POST', '/users-bulk', { accountIds: userIds });
 }
 
 /**
@@ -48,6 +49,6 @@ export async function bulkGetUsers(
 export async function inviteUser(
   client: ConfluenceClient,
   email: string
-): Promise<any> {
-  return client.request<any>('POST', '/user/access/invite-by-email', { email });
+): Promise<UserResponse> {
+  return client.request<UserResponse>('POST', '/user/access/invite-by-email', { email });
 }

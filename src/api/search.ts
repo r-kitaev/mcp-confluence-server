@@ -1,5 +1,5 @@
 import type { ConfluenceClient } from './client.js';
-import type { PaginatedResponse } from '../types.js';
+import type { SearchResponse } from '../types.js';
 
 export interface SearchOptions {
   limit?: number;
@@ -24,7 +24,7 @@ export async function search(
   client: ConfluenceClient,
   cql: string,
   options?: SearchOptions
-): Promise<PaginatedResponse<any>> {
+): Promise<SearchResponse> {
   const params = new URLSearchParams();
   params.set('cql', cql);
   
@@ -33,7 +33,7 @@ export async function search(
   if (options?.includeHighlighting) params.set('highlight', 'true');
 
   const query = params.toString();
-  return client.request<PaginatedResponse<any>>('GET', `/search${query ? `?${query}` : ''}`);
+  return client.request<SearchResponse>('GET', `/search${query ? `?${query}` : ''}`);
 }
 
 /**
@@ -48,7 +48,7 @@ export async function searchByLabel(
   client: ConfluenceClient,
   label: string,
   limit?: number
-): Promise<PaginatedResponse<any>> {
+): Promise<SearchResponse> {
   return search(client, `label = "${label}"`, { limit });
 }
 
@@ -64,7 +64,7 @@ export async function searchRecent(
   client: ConfluenceClient,
   spaceId?: string,
   limit?: number
-): Promise<PaginatedResponse<any>> {
+): Promise<SearchResponse> {
   const cql = spaceId
     ? `space = "${spaceId}" AND lastModified >= -7d`
     : 'lastModified >= -7d';
